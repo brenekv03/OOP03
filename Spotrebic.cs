@@ -9,10 +9,10 @@ namespace OOP03
     class Spotrebic
     {
         private string kod;
-        private double prikon;
-        private TimeSpan celkovaDobaProvozu;
+        private double prikon; //wattsekundy
+        private TimeSpan celkovaDobaProvozu = new TimeSpan();
         private DateTime okamzikZapnuti;
-        private bool jeVProvozu;
+        private bool jeVProvozu = false;
         public string Kod
         {
             get
@@ -21,25 +21,19 @@ namespace OOP03
             }
             set 
             {
-                // pořešit nefunguje
-                for(int i = 0; i < value.Length;++i)
+                //oprava
+                string prac = value;
+                prac = value.ToUpper();
+                int i = 0;
+                while(i<prac.Length)
                 {
-                    if (char.IsNumber(value[i])) { }
-                    else if (char.IsLetter(value[i]))
+                    if (!char.IsLetterOrDigit(prac[i]) && !(prac[i] == '-'))
                     {
-                        if (char.IsLower(value[i]))
-                        {
-                            value =  char.ToUpper(value[i]) + value.Substring(i+1);
-                            System.Windows.Forms.MessageBox.Show(value.ToString());
-                        }
+                        prac = prac.Remove(i, 1);
                     }
-                    else if (value[i] == '-') { }
-                    else
-                    {
-                        value = value.Remove(i, 1) + value.Substring(i+1);
-                    }
+                    else ++i;
                 }
-                kod = value;
+                kod = prac;
             }
         }
         public bool JeVProvozu 
@@ -51,7 +45,8 @@ namespace OOP03
         }
         public Spotrebic(string kod, double prikon)
         {
-            this.kod = kod;
+            //vlastnost neni this
+            Kod = kod;
             this.prikon = prikon;
         }
         public void Zapni()
@@ -67,20 +62,16 @@ namespace OOP03
         }
         public double CelkovaSpotreba()
         {
-            double spotreba = 0;
+            double spotreba = celkovaDobaProvozu.TotalSeconds * prikon;
             if (JeVProvozu) 
             {
-                spotreba = double.Parse((DateTime.Now - okamzikZapnuti).TotalSeconds.ToString())*prikon;
-            }
-            else 
-            {
-                spotreba = double.Parse(celkovaDobaProvozu.TotalSeconds.ToString()) * prikon;
+                spotreba += (DateTime.Now - okamzikZapnuti).TotalSeconds * prikon;
             }
             return spotreba;
         }
         public override string ToString()
         {
-            string s = "\nKód spotřebiče je: " + Kod +"\nCelková doba provozu je: " + celkovaDobaProvozu.TotalSeconds + " sekund\n" + "Celková spotřeba je: " + CelkovaSpotreba() + "W";
+            string s = "\nKód spotřebiče je: " + Kod +"\nCelková doba provozu je: " + celkovaDobaProvozu.TotalSeconds + " sekund\n" + "Celková spotřeba je: " + CelkovaSpotreba() + "Wattsekund";
             return base.ToString() + s;
         }
     }
